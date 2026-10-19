@@ -1,20 +1,3 @@
-// function toggleInfo() {
-//     const box = document.getElementById("extra-info");
-//     const btn = document.querySelector("test_button");
-  
-//     if (box.style.display === "none") {
-//       box.style.display = "block";
-//       btn.textContent = "Show Less";
-//     } else {
-//       box.style.display = "none";
-//       btn.textContent = "Show More";
-//     }
-// }
-
-// function changeColor(color) {
-//   document.getElementById('pot').style.backgroundColor = color;
-// }
-
 // shaders
 var VSHADER_SOURCE = `
     attribute vec4 a_Position;
@@ -104,33 +87,8 @@ function main() {
     setupWebGL();
     connectVariablesToGLSL();
 
-    // // mouse drag to rotate
-    // canvas.addEventListener('mousemove', function(ev) {
-    //     if (ev.buttons == 1) {
-    //         g_mouseX = (ev.clientX - canvas.width/2) / (canvas.width/2) * 180;
-    //         g_mouseY = (ev.clientY - canvas.height/2) / (canvas.height/2) * 180;
-    //         renderScene();
-    //     }
-    // });
     let lastMouseX = 0;
     let lastMouseY = 0;
-
-    // canvas.addEventListener('mousedown', function(ev) {
-    //     lastMouseX = ev.clientX;
-    //     lastMouseY = ev.clientY;
-    // });
-
-    // canvas.addEventListener('mousemove', function(ev) {
-    //     if (ev.buttons == 1) {
-    //         const dx = ev.clientX - lastMouseX;
-    //         const dy = ev.clientY - lastMouseY;
-    //         g_mouseX += dx * 0.5;
-    //         g_mouseY += dy * 0.5;
-    //         lastMouseX = ev.clientX;
-    //         lastMouseY = ev.clientY;
-    //         renderScene();
-    //     }
-    // });
 
     canvas.addEventListener('mousedown', function(ev) {
         lastMouseX = ev.clientX;
@@ -155,10 +113,14 @@ function main() {
         }
     });
 
-    gl.clearColor(0.96,0.96,0.96,1.0);
+    // gl.clearColor(0.96,0.96,0.96,1.0);
+    gl.clearColor(0.902, 0.941, 0.933, 1.0);
+
+    rotationMatrix.rotate(-20, 1, 0, 0);
+    rotationMatrix.rotate(-30, 0, 1, 0);
+
     renderScene();
 }
-
 
 function drawTriangle3DWithNormal(vertices, normal) {
     var n = vertices.length / 3;
@@ -181,25 +143,10 @@ function drawTriangle3DWithNormal(vertices, normal) {
     gl.drawArrays(gl.TRIANGLES, 0, n);
 }
 
-
 function renderScene() {
-    // var globalRotMat = new Matrix4()
-    //     .rotate(-g_mouseX, 0, 1, 0)
-    //     .rotate(-g_mouseY, 1, 0, 0);
-    // gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, rotationMatrix.elements);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-
-    // draw your box here
-
-    // var box = new Cube();
-    // box.color = currentColor;
-    // box.matrix.translate(0, 0, 1);
-    // box.matrix.scale(dims.w/10 * 1.5, dims.h/10 * 1.5, dims.d/10 * 1.5);
-    // box.matrix.translate(-0.5, -0.5, -0.5);
-    // box.render();
 
     if (dims.w === 10) {
         // two boxes side by side
@@ -227,7 +174,6 @@ function renderScene() {
     }
 }
 
-
 let selectedTree = null;
 
 function toggleTreeMenu() {
@@ -243,4 +189,27 @@ function selectTree(tree, el) {
     // close the dropdown
     document.querySelector('.tree-btn').classList.add('selected'); //change color when clicked
     document.getElementById('tree-options').classList.remove('open');
+
+    const img = document.getElementById('tree-image');
+    const filename = tree.toLowerCase().replace(/ /g, '_');
+
+    img.onerror = function() {
+        img.onerror = function() {
+            img.style.display = 'none';
+            document.getElementById('no-image-msg').style.display = 'block';
+        };
+        img.src = 'images/' + filename + '.jpg';
+    };
+    img.src = 'images/' + filename + '.avif';
+    document.getElementById('no-image-msg').style.display = 'none';
+    img.style.display = 'block';
+    
 }
+
+// when you click anywhere on the screen off of the tree menu, it closes
+document.addEventListener('click', function(ev) {
+    const treeGroup = document.querySelector('.tree-group');
+    if (!treeGroup.contains(ev.target)) {
+        document.getElementById('tree-options').classList.remove('open');
+    }
+});
